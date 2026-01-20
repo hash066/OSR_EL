@@ -1,7 +1,9 @@
 import os
 import subprocess
+import argparse
+import time
 
-def scan_files():
+def scan_files(demo_mode=False):
     """
     Scans kernel logs for entries related to found files or hidden files.
 
@@ -10,6 +12,13 @@ def scan_files():
     """
     print("Scanning for hidden files...")
     
+    if demo_mode:
+        time.sleep(1.5)
+        print("Hidden files or scanned entries detected:")
+        print("- [ALERT] Found hidden file: /etc/.rootkit_config (hidden attribute set)")
+        print("- [ALERT] Found hidden file: /tmp/.hidden_payload (not visible in ls)")
+        return
+
     try:
         # Execute the dmesg command and capture its output
         result = subprocess.run(["dmesg"], capture_output=True, text=True, check=True)
@@ -31,4 +40,7 @@ def scan_files():
         print(f"[ERROR] An unexpected error occurred: {e}")
 
 if __name__ == "__main__":
-    scan_files()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--demo", action="store_true", help="Run in Demo Mode")
+    args = parser.parse_args()
+    scan_files(args.demo)

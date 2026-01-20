@@ -4,6 +4,7 @@ obj-m += process_scanner.o
 obj-m += idt_ssdt_checker.o
 obj-m += file_scanner.o
 obj-m += module_checker.o
+obj-m += kernel_advanced.o
 
 # Kernel build directory
 KDIR := /lib/modules/$(shell uname -r)/build

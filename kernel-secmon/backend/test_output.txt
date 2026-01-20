@@ -1,0 +1,53 @@
+﻿python : Traceback 
+(most recent call 
+last):
+At line:1 char:1
++ python 
+test_gemini.py 2>&1 
+| Out-File -FilePath 
+test_output.txt 
+-Enco ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (Traceba   
+ ck (most recent     
+call last)::Stri    
+ng) [], RemoteEx    
+ception
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+  File "E:\SEM 3\Root
+kit-Detector\kernel-s
+ecmon\backend\test_ge
+mini.py", line 79, 
+in <module>
+    
+print("\n\U0001f680 
+Starting Gemini AI 
+Integration Tests\n")
+  File "C:\Users\asus
+\AppData\Local\Progra
+ms\Python\Python311\L
+ib\encodings\cp1252.p
+y", line 19, in 
+encode
+    return codecs.cha
+rmap_encode(input,sel
+f.errors,encoding_tab
+le)[0]
+           ^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+^^^
+UnicodeEncodeError: 
+'charmap' codec 
+can't encode 
+character 
+'\U0001f680' in 
+position 2: 
+character maps to 
+<undefined>

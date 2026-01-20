@@ -1,6 +1,9 @@
 import subprocess
+import argparse
+import random
+import time
 
-def scan_processes():
+def scan_processes(demo_mode=False):
     """
     Scans kernel logs for entries related to process detection.
 
@@ -8,6 +11,19 @@ def scan_processes():
     containing "Detected process," typically logged by a kernel module.
     """
     print("Scanning for processes...")
+
+    if demo_mode:
+        time.sleep(1)
+        # Simulate some hidden processes with random PIDs
+        hidden_procs = [
+            f"Detected process: kworker/u4:0-events [PID: {random.randint(100, 999)}]",
+            f"Detected process: malicious_script.sh [PID: {random.randint(1000, 9999)}]"
+        ]
+        
+        print("Detected Processes:")
+        for proc in hidden_procs:
+            print(f"- {proc}")
+        return
 
     try:
         # Run the dmesg command and capture the output
@@ -30,4 +46,7 @@ def scan_processes():
         print(f"[ERROR] An unexpected error occurred: {e}")
 
 if __name__ == "__main__":
-    scan_processes()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--demo", action="store_true", help="Run in Demo Mode")
+    args = parser.parse_args()
+    scan_processes(args.demo)
