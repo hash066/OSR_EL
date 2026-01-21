@@ -5,7 +5,7 @@ from typing import List, Deque
 from collections import deque
 import random
 from models import KernelEvent
-from database import init_db, save_event, get_recent_events, get_stats, get_suspicious_processes
+from database import init_db, save_event, get_recent_events, get_stats, get_suspicious_processes, get_process_tree
 from analyzer import analyze_event, check_behavioral_patterns, get_event_analysis
 from response import execute_mitigation
 import json
@@ -67,6 +67,12 @@ async def fetch_event_analysis(event_id: int):
 @app.get("/api/processes/suspicious")
 async def fetch_suspicious_procs():
     return get_suspicious_processes()
+
+@app.get("/api/processes/tree")
+async def fetch_process_tree():
+    """Returns process tree data for force graph visualization."""
+    return get_process_tree()
+
 
 @app.post("/api/ingest")
 async def ingest_event(event: KernelEvent, api_key: str = None):

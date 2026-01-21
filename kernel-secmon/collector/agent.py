@@ -7,7 +7,7 @@ import os
 import re
 
 # Configuration
-BACKEND_URL = "http://localhost:8000/api/ingest"
+BACKEND_URL = "http://localhost:8001/api/ingest"
 API_KEY = "SEC_MON_SECRET_KEY_2026"
 KERNEL_TAG = "SEC_MON"
 LOG_FILE = "../kernel_events.log" # Relative to collector/ dir (assuming run from collector/)
@@ -30,11 +30,17 @@ def parse_line(line):
         details = match.group(2)
         
         pid = 0
+        parent_pid = 0
         process_name = "unknown"
         
         pid_match = re.search(r"PID=(\d+)", details)
         if pid_match:
             pid = int(pid_match.group(1))
+        
+        # Extract parent PID if present
+        parent_match = re.search(r"parent[=:]?\s*(\d+)", details, re.IGNORECASE)
+        if parent_match:
+            parent_pid = int(parent_match.group(1))
             
         proc_match = re.search(r"\(([^)]+)\)", details)
         if proc_match:
@@ -45,12 +51,13 @@ def parse_line(line):
         severity = "INFO"
         if "PRIV_ESC" in event_type or "ROOTKIT" in event_type:
             severity = "HIGH"
-        elif "HIDDEN" in event_type or "ANOMALY" in event_type or "SYSCALL" in event_type:
+        elif "HIDDEN" in event_type or "ANOMALY" in event_type or "SYSCALL" in event_type or "NETWORK" in event_type:
             severity = "MEDIUM"
 
         return {
             "timestamp": datetime.datetime.now().isoformat(),
             "pid": pid,
+            "parent_pid": parent_pid,
             "process_name": process_name,
             "severity": severity,
             "type": event_type,

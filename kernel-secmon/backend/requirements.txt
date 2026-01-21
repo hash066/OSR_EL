@@ -5,3 +5,4 @@ python-multipart
 websockets
 google-generativeai
 python-dotenv
+requests>=2.31.0

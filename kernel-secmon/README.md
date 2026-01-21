@@ -33,28 +33,40 @@ graph LR
 -   **Frontend**: React (Vite), Tailwind CSS, Lucide Icons, Recharts (ready)
 -   **Collector**: Python (Requests)
 
-## ⚡ Quick Start (Red Team Demo)
+## ⚡ Quick Start (Complete Demo)
 
-To perform a **Live Security Demonstration**:
+**Windows (Recommended)**:
+```bash
+START_ALL.bat
+```
+This automated script will:
+1. Start the Backend API Server
+2. Start the **Normal Feed Generator** (continuous benign activity)
+3. Start the Collector Agent (watches `kernel_events.log`)
+4. Wait for your input to run the Red Team attack simulation
 
-1.  **Start the Environment**:
+**What You'll See**:
+- **Normal Activity**: Continuous baseline events (process spawns, file access, network connections)
+- **Attack Events**: When you press a key, malicious events will appear alongside normal ones
+- **Real-time Detection**: Watch the dashboard detect infiltration, privilege escalation, and rootkit loading!
+
+**Manual Launch (Linux/WSL)**:
+1. **Start Background Services**:
     ```bash
     cd scripts
     bash dev.sh
     ```
-    This starts the Backend, Frontend, and Collector (watching `kernel_events.log`).
+    
+2. **Open Dashboard**: Navigate to `http://localhost:5173`
 
-2.  **Open Dashboard**:
-    Navigate to `http://localhost:5173`. You will see a "Live Feed" waiting for data.
-
-3.  **Launch Attack (In a new terminal)**:
+3. **Launch Attack (In a new terminal)**:
     ```bash
     cd scripts
     python red_team.py
     ```
-    -   This script will create **real files** on disk (`suspicious_payload.sh`).
-    -   It will write to `kernel_events.log`.
-    -   Watch the Dashboard detect the infiltration, privilege escalation, and rootkit loading in real-time!
+    - Creates **real files** on disk (`suspicious_payload.sh`)
+    - Writes attack events to `kernel_events.log`
+    - Malicious events appear alongside normal system activity
 
 ## ⚡ Quick Start (Auto Mock Mode)
 If you just want background noise without running the attack script manually:

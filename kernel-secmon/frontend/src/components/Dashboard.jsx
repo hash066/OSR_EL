@@ -3,8 +3,9 @@ import StatsCards from './StatsCards';
 import AlertFeed from './AlertFeed';
 import ThreatTimeline from './ThreatTimeline';
 import SystemStatus3D from './SystemStatus3D';
+import ProcessGraph from './ProcessGraph';
 import AnalysisModal from './AnalysisModal';
-import { ShieldCheck, Activity, Cpu, Wifi, History } from 'lucide-react';
+import { ShieldCheck, Activity, Cpu, Wifi, History, GitBranch } from 'lucide-react';
 
 const Dashboard = () => {
     const [events, setEvents] = useState([]);
@@ -17,11 +18,11 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const evRes = await fetch('http://localhost:8000/api/events');
+                const evRes = await fetch('http://localhost:8001/api/events');
                 const evData = await evRes.json();
                 setEvents(evData);
 
-                const stRes = await fetch('http://localhost:8000/api/stats');
+                const stRes = await fetch('http://localhost:8001/api/stats');
                 const stData = await stRes.json();
                 setStats(stData);
             } catch (err) {
@@ -32,7 +33,7 @@ const Dashboard = () => {
         fetchData();
 
         const connectWs = () => {
-            const ws = new WebSocket('ws://localhost:8000/ws/feed');
+            const ws = new WebSocket('ws://localhost:8001/ws/feed');
             ws.onopen = () => {
                 console.log('Connected to WS');
                 setIsConnected(true);
@@ -117,6 +118,17 @@ const Dashboard = () => {
                     <div className="space-y-6">
                         {/* 3D Status Visualization */}
                         <SystemStatus3D stats={stats} />
+
+                        {/* Process Lineage Graph */}
+                        <div className="bg-cyber-card rounded-xl p-6 border border-cyber-border shadow-lg">
+                            <h3 className="text-md font-bold text-white mb-6 font-display flex items-center gap-2">
+                                <GitBranch className="text-cyber-primary" size={18} />
+                                PROCESS_LINEAGE_MAP
+                            </h3>
+                            <div className="h-[400px]">
+                                <ProcessGraph onNodeClick={handleEventClick} />
+                            </div>
+                        </div>
 
                         {/* Status Panel */}
                         <div className="bg-cyber-card rounded-xl p-6 border border-cyber-border shadow-lg">

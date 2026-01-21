@@ -2,6 +2,7 @@ import sqlite3
 from models import KernelEvent
 from datetime import datetime, timedelta
 from gemini_service import generate_xai_explanation, generate_knowledge_graph_data
+from threat_intel import enrich_event_with_threat_intel
 
 def analyze_event(event: KernelEvent):
     """
@@ -54,7 +55,8 @@ def check_behavioral_patterns(db_path="kernel_secmon.db"):
 
 def get_event_analysis(event_id, db_path="kernel_secmon.db"):
     """
-    Returns enriched analysis and graph data for a specific event using Gemini AI.
+    Returns enriched analysis and graph data for a specific event using Gemini AI
+    and threat intelligence.
     """
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -65,7 +67,7 @@ def get_event_analysis(event_id, db_path="kernel_secmon.db"):
         conn.close()
         return None
         
-    _, timestamp, pid, name, severity, type, details = row
+    _, timestamp, pid, name, severity, type, details = row[:7]  # Handle optional parent_pid
     
     # 1. Generate XAI explanation using Gemini AI
     explanation = generate_xai_explanation(
@@ -84,11 +86,16 @@ def get_event_analysis(event_id, db_path="kernel_secmon.db"):
         details=details
     )
 
+    # 3. Enrich with Threat Intelligence
+    threat_intel = enrich_event_with_threat_intel(details)
+
     conn.close()
     return {
         "event_id": event_id,
         "xai_explanation": explanation,
         "graph": graph,
+        "threat_intel": threat_intel,
         "raw_details": details
     }
+
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShieldAlert, Cpu, Network, Zap } from 'lucide-react';
+import { X, ShieldAlert, Cpu, Network, Zap, AlertTriangle, ExternalLink } from 'lucide-react';
 import KnowledgeGraph from './KnowledgeGraph';
 
 const AnalysisModal = ({ isOpen, onClose, event }) => {
@@ -10,7 +10,7 @@ const AnalysisModal = ({ isOpen, onClose, event }) => {
     useEffect(() => {
         if (isOpen && event && event.id) {
             setLoading(true);
-            fetch(`http://localhost:8000/api/analysis/${event.id}`)
+            fetch(`http://localhost:8001/api/analysis/${event.id}`)
                 .then(res => res.json())
                 .then(data => {
                     setAnalysis(data);
@@ -101,6 +101,96 @@ const AnalysisModal = ({ isOpen, onClose, event }) => {
                                         <span className="text-[10px] text-slate-500 uppercase block mb-1">Raw_Kernel_Data</span>
                                         <span className="text-[11px] font-mono text-slate-400 break-all">{event.details}</span>
                                     </div>
+                                </div>
+                            </div>
+
+                            {/* Threat Intelligence Section */}
+                            <div>
+                                <h3 className="text-xs font-mono font-bold text-cyber-warning p-1 border-l-2 border-cyber-warning mb-4 flex items-center gap-2">
+                                    <AlertTriangle size={14} /> THREAT_INTELLIGENCE
+                                </h3>
+                                <div className="space-y-3">
+                                    {loading ? (
+                                        <div className="p-4 bg-cyber-dark rounded-xl border border-cyber-border/50 animate-pulse">
+                                            <div className="h-4 bg-slate-800 rounded w-2/3"></div>
+                                        </div>
+                                    ) : analysis?.threat_intel?.has_network_activity ? (
+                                        <>
+                                            {/* Threat Score Summary */}
+                                            <div className="p-4 bg-cyber-dark rounded-xl border border-cyber-border/50">
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <span className="text-[10px] text-slate-500 uppercase">Max Threat Score</span>
+                                                    <span className={`text-2xl font-bold font-mono ${analysis.threat_intel.max_threat_score > 70 ? 'text-cyber-alert' :
+                                                            analysis.threat_intel.max_threat_score > 30 ? 'text-cyber-warning' :
+                                                                'text-cyber-primary'
+                                                        }`}>
+                                                        {analysis.threat_intel.max_threat_score}
+                                                    </span>
+                                                </div>
+                                                <div className="w-full bg-cyber-black h-2 rounded-full overflow-hidden">
+                                                    <div
+                                                        className={`h-full transition-all ${analysis.threat_intel.max_threat_score > 70 ? 'bg-cyber-alert' :
+                                                                analysis.threat_intel.max_threat_score > 30 ? 'bg-cyber-warning' :
+                                                                    'bg-cyber-primary'
+                                                            }`}
+                                                        style={{ width: `${analysis.threat_intel.max_threat_score}%` }}
+                                                    ></div>
+                                                </div>
+                                            </div>
+
+                                            {/* Malicious IPs */}
+                                            {analysis.threat_intel.malicious_ips.length > 0 && (
+                                                <div className="p-4 bg-cyber-alert/10 rounded-xl border border-cyber-alert/30">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <ShieldAlert size={14} className="text-cyber-alert" />
+                                                        <span className="text-xs font-bold text-cyber-alert uppercase">Known Malicious IPs Detected</span>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        {analysis.threat_intel.malicious_ips.map((intel, idx) => (
+                                                            <div key={idx} className="text-[11px] font-mono text-slate-300 flex items-center justify-between">
+                                                                <span>{intel.ip} ({intel.country_code})</span>
+                                                                <a
+                                                                    href={intel.report_url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="text-cyber-primary hover:text-cyber-secondary flex items-center gap-1"
+                                                                >
+                                                                    Report <ExternalLink size={10} />
+                                                                </a>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* All Checked IPs */}
+                                            <div className="p-4 bg-cyber-dark rounded-xl border border-cyber-border/50">
+                                                <span className="text-[10px] text-slate-500 uppercase block mb-2">Analyzed IPs ({analysis.threat_intel.checked_ips.length})</span>
+                                                <div className="space-y-2 max-h-32 overflow-y-auto">
+                                                    {analysis.threat_intel.checked_ips.map((intel, idx) => (
+                                                        <div key={idx} className="text-[10px] font-mono flex items-center justify-between p-2 bg-cyber-black rounded border border-cyber-border/30">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className={`w-2 h-2 rounded-full ${intel.is_malicious ? 'bg-cyber-alert' : 'bg-cyber-primary'}`}></div>
+                                                                <span className="text-slate-300">{intel.ip}</span>
+                                                                <span className="text-slate-600">({intel.country_code})</span>
+                                                            </div>
+                                                            <span className={`font-bold ${intel.threat_score > 70 ? 'text-cyber-alert' :
+                                                                    intel.threat_score > 30 ? 'text-cyber-warning' :
+                                                                        'text-cyber-primary'
+                                                                }`}>
+                                                                {intel.threat_score}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="p-4 bg-cyber-dark rounded-xl border border-cyber-border/50 text-center">
+                                            <Network size={24} className="text-slate-600 mx-auto mb-2" />
+                                            <p className="text-[10px] text-slate-500 font-mono">No network activity detected</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
